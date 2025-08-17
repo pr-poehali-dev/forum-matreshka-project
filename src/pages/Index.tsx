@@ -3,11 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Icon from "@/components/ui/icon";
 
 const Index = () => {
@@ -15,6 +15,7 @@ const Index = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   const handleLogin = () => {
     if (username === "Finn_Maestrovich" && password === "29092011") {
@@ -46,6 +47,36 @@ const Index = () => {
     { id: 2, type: "Оскорбления", reporter: "UserReport2", target: "ToxicUser", status: "В работе" },
     { id: 3, type: "Читы", reporter: "UserReport3", target: "Cheater123", status: "Решено" }
   ];
+
+  const forumThreads = [
+    { id: 1, title: "Новое обновление сервера v2.5", author: "Phoenix_Admin", replies: 45, views: 1203, lastPost: "2 мин назад" },
+    { id: 2, title: "Правила ролевой игры", author: "Moderator_Team", replies: 12, views: 856, lastPost: "15 мин назад" },
+    { id: 3, title: "Набор в полицейский департамент", author: "ChiefPolice", replies: 28, views: 734, lastPost: "1 час назад" },
+    { id: 4, title: "Жалоба на читера", author: "ReportUser", replies: 3, views: 156, lastPost: "2 часа назад" }
+  ];
+
+  const sidebarMenuItems = [
+    { id: "dashboard", icon: "BarChart3", label: "Дашборд", count: null },
+    { id: "users", icon: "Users", label: "Пользователи", count: forumStats.totalUsers },
+    { id: "forum", icon: "MessageSquare", label: "Форум", count: forumStats.totalThreads },
+    { id: "posts", icon: "FileText", label: "Сообщения", count: forumStats.totalPosts },
+    { id: "reports", icon: "AlertTriangle", label: "Жалобы", count: 3 },
+    { id: "bans", icon: "Ban", label: "Баны", count: 15 },
+    { id: "settings", icon: "Settings", label: "Настройки", count: null },
+    { id: "logs", icon: "FileSearch", label: "Логи", count: null }
+  ];
+
+  const handleDeleteThread = (threadId: number) => {
+    if (confirm("Вы уверены, что хотите удалить эту тему?")) {
+      console.log(`Удаление темы ${threadId}`);
+    }
+  };
+
+  const handleDeletePost = (postId: number) => {
+    if (confirm("Вы уверены, что хотите удалить это сообщение?")) {
+      console.log(`Удаление сообщения ${postId}`);
+    }
+  };
 
   if (!isLoggedIn) {
     return (
@@ -92,67 +123,12 @@ const Index = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Admin Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <Icon name="Shield" size={20} className="text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold">Админ-панель</h1>
-                <p className="text-sm text-muted-foreground">Phoenix Mobile RP</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                    FM
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-medium">Finn_Maestrovich</span>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => setIsLoggedIn(false)}>
-                <Icon name="LogOut" size={16} className="mr-2" />
-                Выйти
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="dashboard">
-              <Icon name="BarChart3" size={16} className="mr-2" />
-              Дашборд
-            </TabsTrigger>
-            <TabsTrigger value="users">
-              <Icon name="Users" size={16} className="mr-2" />
-              Пользователи
-            </TabsTrigger>
-            <TabsTrigger value="forum">
-              <Icon name="MessageSquare" size={16} className="mr-2" />
-              Форум
-            </TabsTrigger>
-            <TabsTrigger value="reports">
-              <Icon name="AlertTriangle" size={16} className="mr-2" />
-              Жалобы
-            </TabsTrigger>
-            <TabsTrigger value="settings">
-              <Icon name="Settings" size={16} className="mr-2" />
-              Настройки
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard" className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  const renderContent = () => {
+    switch(activeSection) {
+      case "dashboard":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Всего пользователей</CardTitle>
@@ -160,12 +136,9 @@ const Index = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{forumStats.totalUsers.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +{forumStats.todayRegistrations} за сегодня
-                  </p>
+                  <p className="text-xs text-muted-foreground">+{forumStats.todayRegistrations} за сегодня</p>
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Онлайн сейчас</CardTitle>
@@ -173,12 +146,9 @@ const Index = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-500">{forumStats.onlineUsers}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Пиковый онлайн: 245
-                  </p>
+                  <p className="text-xs text-muted-foreground">Пиковый онлайн: 245</p>
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Всего сообщений</CardTitle>
@@ -186,14 +156,20 @@ const Index = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{forumStats.totalPosts.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +{forumStats.todayPosts} за сегодня
-                  </p>
+                  <p className="text-xs text-muted-foreground">+{forumStats.todayPosts} за сегодня</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Всего тем</CardTitle>
+                  <Icon name="FileText" size={16} className="text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{forumStats.totalThreads.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">+12 за сегодня</p>
                 </CardContent>
               </Card>
             </div>
-
-            {/* Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -205,9 +181,7 @@ const Index = () => {
                       <div key={index} className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <Avatar className="w-8 h-8">
-                            <AvatarFallback className="text-xs">
-                              {user.name.slice(0, 2).toUpperCase()}
-                            </AvatarFallback>
+                            <AvatarFallback className="text-xs">{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="font-medium text-sm">{user.name}</p>
@@ -226,7 +200,6 @@ const Index = () => {
                   </div>
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader>
                   <CardTitle>Последние жалобы</CardTitle>
@@ -237,14 +210,9 @@ const Index = () => {
                       <div key={report.id} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
                         <div>
                           <p className="font-medium text-sm">{report.type}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {report.reporter} → {report.target}
-                          </p>
+                          <p className="text-xs text-muted-foreground">{report.reporter} → {report.target}</p>
                         </div>
-                        <Badge variant={
-                          report.status === "Новый" ? "destructive" :
-                          report.status === "В работе" ? "default" : "secondary"
-                        }>
+                        <Badge variant={report.status === "Новый" ? "destructive" : report.status === "В работе" ? "default" : "secondary"}>
                           {report.status}
                         </Badge>
                       </div>
@@ -253,31 +221,28 @@ const Index = () => {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
+          </div>
+        );
 
-          <TabsContent value="users" className="space-y-6">
+      case "forum":
+        return (
+          <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Управление пользователями</CardTitle>
-                <CardDescription>Поиск и управление аккаунтами игроков</CardDescription>
+                <CardTitle>Управление темами форума</CardTitle>
+                <CardDescription>Модерация и удаление тем</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex space-x-2">
-                  <Input placeholder="Поиск по никнейму..." className="flex-1" />
-                  <Button>
-                    <Icon name="Search" size={16} />
-                  </Button>
-                </div>
-                <div className="space-y-2">
-                  {recentUsers.map((user, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-muted/20 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-sm text-muted-foreground">{user.role}</p>
+              <CardContent>
+                <div className="space-y-4">
+                  {forumThreads.map((thread) => (
+                    <div key={thread.id} className="flex items-center justify-between p-4 bg-muted/20 rounded-lg hover:bg-muted/30 transition-colors">
+                      <div className="flex-1">
+                        <h4 className="font-medium">{thread.title}</h4>
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-1">
+                          <span>Автор: {thread.author}</span>
+                          <span>Ответов: {thread.replies}</span>
+                          <span>Просмотров: {thread.views}</span>
+                          <span>Последний пост: {thread.lastPost}</span>
                         </div>
                       </div>
                       <div className="flex space-x-2">
@@ -286,8 +251,16 @@ const Index = () => {
                           Редактировать
                         </Button>
                         <Button variant="outline" size="sm">
-                          <Icon name="Ban" size={14} className="mr-1" />
-                          Забанить
+                          <Icon name="Lock" size={14} className="mr-1" />
+                          Закрыть
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          onClick={() => handleDeleteThread(thread.id)}
+                        >
+                          <Icon name="Trash2" size={14} className="mr-1" />
+                          Удалить
                         </Button>
                       </div>
                     </div>
@@ -295,140 +268,188 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
+        );
 
-          <TabsContent value="forum" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Управление разделами</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button className="w-full">
-                    <Icon name="Plus" size={16} className="mr-2" />
-                    Создать новый раздел
-                  </Button>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
-                      <span>🏠 Главная страница форума</span>
-                      <Button variant="ghost" size="sm">
-                        <Icon name="Settings" size={14} />
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
-                      <span>📝 Регистрация новых игроков</span>
-                      <Button variant="ghost" size="sm">
-                        <Icon name="Settings" size={14} />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Модерация сообщений</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="p-3 bg-muted/20 rounded-lg">
-                      <p className="font-medium text-sm">Подозрительное сообщение</p>
-                      <p className="text-xs text-muted-foreground">от SpamUser</p>
-                      <div className="flex space-x-2 mt-2">
-                        <Button variant="outline" size="sm">Одобрить</Button>
-                        <Button variant="destructive" size="sm">Удалить</Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="reports" className="space-y-6">
+      case "posts":
+        return (
+          <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Система жалоб</CardTitle>
-                <CardDescription>Рассмотрение жалоб от игроков</CardDescription>
+                <CardTitle>Управление сообщениями</CardTitle>
+                <CardDescription>Модерация и удаление сообщений</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentReports.map((report) => (
-                    <div key={report.id} className="p-4 bg-muted/20 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium">Жалоба #{report.id}: {report.type}</h4>
-                        <Badge variant={
-                          report.status === "Новый" ? "destructive" :
-                          report.status === "В работе" ? "default" : "secondary"
-                        }>
-                          {report.status}
-                        </Badge>
+                  {[1, 2, 3, 4, 5].map((postId) => (
+                    <div key={postId} className="p-4 bg-muted/20 rounded-lg">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="w-8 h-8">
+                            <AvatarFallback>U{postId}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-sm">User_{postId}</p>
+                            <p className="text-xs text-muted-foreground">{postId} часа назад</p>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm">
+                            <Icon name="Edit" size={14} className="mr-1" />
+                            Редактировать
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm" 
+                            onClick={() => handleDeletePost(postId)}
+                          >
+                            <Icon name="Trash2" size={14} className="mr-1" />
+                            Удалить
+                          </Button>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Пользователь <strong>{report.reporter}</strong> пожаловался на <strong>{report.target}</strong>
-                      </p>
+                      <p className="text-sm">Это пример сообщения №{postId} от пользователя. Здесь может быть любой контент, который требует модерации.</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case "users":
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Управление пользователями</CardTitle>
+                <CardDescription>Поиск и управление аккаунтами игроков</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex space-x-2">
+                  <Input placeholder="Поиск по никнейму..." className="flex-1" />
+                  <Button><Icon name="Search" size={16} /></Button>
+                </div>
+                <div className="space-y-2">
+                  {recentUsers.map((user, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 bg-muted/20 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <Avatar><AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback></Avatar>
+                        <div>
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-sm text-muted-foreground">{user.role}</p>
+                        </div>
+                      </div>
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">Рассмотреть</Button>
-                        <Button variant="destructive" size="sm">Принять меры</Button>
-                        <Button variant="ghost" size="sm">Отклонить</Button>
+                        <Button variant="outline" size="sm">
+                          <Icon name="Edit" size={14} className="mr-1" />Редактировать
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Icon name="Ban" size={14} className="mr-1" />Забанить
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
+        );
 
-          <TabsContent value="settings" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Настройки сервера</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="maintenance">Режим обслуживания</Label>
-                    <Switch id="maintenance" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="registration">Регистрация открыта</Label>
-                    <Switch id="registration" defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="chat">Глобальный чат</Label>
-                    <Switch id="chat" defaultChecked />
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label>Максимум игроков онлайн</Label>
-                    <Input type="number" defaultValue="200" />
-                  </div>
-                </CardContent>
-              </Card>
+      default:
+        return <div className="text-center text-muted-foreground">Выберите раздел из меню</div>;
+    }
+  };
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Настройки форума</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="posts">Премодерация сообщений</Label>
-                    <Switch id="posts" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="avatars">Загрузка аватаров</Label>
-                    <Switch id="avatars" defaultChecked />
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label>Сообщений на страницу</Label>
-                    <Input type="number" defaultValue="20" />
-                  </div>
-                </CardContent>
-              </Card>
+  return (
+    <div className="min-h-screen bg-background flex">
+      {/* XenForo Style Sidebar */}
+      <div className="w-64 bg-card border-r border-border flex flex-col">
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+              <Icon name="Shield" size={20} className="text-primary-foreground" />
             </div>
-          </TabsContent>
-        </Tabs>
+            <div>
+              <h1 className="font-bold text-lg">Admin Panel</h1>
+              <p className="text-xs text-muted-foreground">Phoenix Mobile RP</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Menu */}
+        <ScrollArea className="flex-1 p-2">
+          <div className="space-y-1">
+            {sidebarMenuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveSection(item.id)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
+                  activeSection === item.id 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <Icon name={item.icon as any} size={16} />
+                  <span>{item.label}</span>
+                </div>
+                {item.count && (
+                  <Badge variant="secondary" className="text-xs">
+                    {item.count > 999 ? `${Math.floor(item.count / 1000)}k` : item.count}
+                  </Badge>
+                )}
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
+
+        {/* User Info */}
+        <div className="p-4 border-t border-border">
+          <div className="flex items-center space-x-3">
+            <Avatar className="w-8 h-8">
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs">FM</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">Finn_Maestrovich</p>
+              <p className="text-xs text-muted-foreground">Главный админ</p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setIsLoggedIn(false)}>
+              <Icon name="LogOut" size={14} />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Header */}
+        <header className="bg-card border-b border-border p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold capitalize">
+                {sidebarMenuItems.find(item => item.id === activeSection)?.label || 'Панель управления'}
+              </h2>
+              <p className="text-sm text-muted-foreground">Phoenix Mobile RP Admin Panel</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" size="sm">
+                <Icon name="Bell" size={16} className="mr-2" />
+                Уведомления
+              </Button>
+              <Button variant="outline" size="sm">
+                <Icon name="RefreshCw" size={16} className="mr-2" />
+                Обновить
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="flex-1 p-6 overflow-auto">
+          {renderContent()}
+        </main>
       </div>
     </div>
   );
